@@ -48,12 +48,14 @@
                                         <td>{{$user->email}}</td>
                                         <td>{{$user->role == 10 ? 'Admin' : 'Manager'}}</td>
                                         <td>
+                                            @if(auth()->user()->role == 10 and auth()->id() != $user->id)
                                                 <div class="form-check form-switch text-center">
                                                     <input class="form-check-input" name="status" type="checkbox" data-id="{{$user->id}}" id="{{$user->id}}" {{$user->status ? 'checked' : ''}}
-                                                    {{auth()->user()->role !== 10 ? 'disabled' : ''}}
+                                                            {{auth()->user()->role == 9 ? 'disabled' : ''}}
                                                     >
                                                     <label class="form-check-label" for="{{$user->id}}"></label>
                                                 </div>
+                                            @endif
                                         </td>
                                         <td class="text-end">
                                             @if(auth()->user()->role == 10 and auth()->id() != $user->id)
@@ -68,7 +70,7 @@
                                         </td>
                                     </tr>
 
-                                    @endforeach
+                                @endforeach
 
                                 </tbody>
                             </table>

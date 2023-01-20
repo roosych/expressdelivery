@@ -13,11 +13,9 @@ use function Symfony\Component\String\length;
 
 class DriverController extends Controller
 {
-    const API_KEY = 'js-sfCOcHWPcdLKFauZi5fKTcZ3yeo8xqP8X5OwTWvCOBg3KtGsAs8fDr3TMzmMDw70';
-
     public function index()
     {
-        $drivers = Driver::query()->paginate(50);
+        $drivers = Driver::query()->get();
         return view('drivers.index', compact('drivers'));
     }
 
@@ -101,7 +99,7 @@ class DriverController extends Controller
                         "properties" => [
                             "id" => $item['id'],
                             "fullname" => $item['fullname'],
-                            "service" => $item['service'],
+                            "service" => (boolean)$item['service'],
                             "latitude" => $item['latitude'],
                             "longitude" => $item['longitude'],
                             "phone" => $item['phone'],

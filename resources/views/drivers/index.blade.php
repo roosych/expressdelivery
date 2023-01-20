@@ -32,9 +32,9 @@
 
             <div class="col-12">
                 <div class="card hp-contact-card mb-32">
-                    <div class="card-body px-0">
+                    <div class="card-body py-24">
                         <div class="table-responsive">
-                            <table class="table align-middle table-hover table-borderless">
+                            <table id="example" class="table align-middle table-hover table-borderless">
                                 <thead>
                                 <tr>
                                     <th>Name</th>
@@ -94,11 +94,6 @@
                             </table>
                         </div>
 
-                        <div class="container">
-                            {{$drivers->links()}}
-                        </div>
-
-
                     </div>
                 </div>
             </div>
@@ -107,7 +102,25 @@
     </div>
 @endsection
 
+@push('css')
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.1/css/dataTables.bootstrap5.min.css">
+@endpush
+
 @push('js')
+    <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.13.1/js/dataTables.bootstrap5.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#example').DataTable({
+                "iDisplayLength": 25,
+                "columnDefs": [
+                    { "orderable": false, "targets": [1, 3, 4, 6, 7] }
+                ]
+            });
+        });
+    </script>
+
     <script>
         $(function() {
             $('[data-toggle="popover"]').popover()
