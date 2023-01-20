@@ -7,7 +7,9 @@ use App\Http\Controllers\VehicleController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth'])->group(function (){
+Route::redirect('/', '/dashboard');
+
+Route::middleware(['auth', 'activeuser'])->group(function (){
     Route::get('/profile', [UserController::class, 'profile'])->name('user.profile');
 
     Route::group(['prefix' => 'dashboard'], function (){
@@ -15,13 +17,12 @@ Route::middleware(['auth'])->group(function (){
 
         Route::group(['prefix' => 'users'], function (){
             Route::get('/', [UserController::class, 'index'])->name('users.index');
-            Route::get('add', [UserController::class, 'add'])->name('user.add');
-            Route::get('edit/{user}', [UserController::class, 'edit'])->name('user.edit');
-            Route::post('add', [UserController::class, 'store'])->name('user.store');
-            Route::post('update/{user}', [UserController::class, 'update'])->name('user.update');
-            Route::post('/', [UserController::class, 'status'])->name('user.status');
-
-            Route::middleware(['global_admin'])->group(function(){
+            Route::middleware(['global.admin'])->group(function(){
+                Route::get('add', [UserController::class, 'add'])->name('user.add');
+                Route::get('edit/{user}', [UserController::class, 'edit'])->name('user.edit');
+                Route::post('add', [UserController::class, 'store'])->name('user.store');
+                Route::post('update/{user}', [UserController::class, 'update'])->name('user.update');
+                Route::post('/', [UserController::class, 'status'])->name('user.status');
                 Route::get('/delete/{id}', [UserController::class, 'delete'])->name('user.delete');
             });
         });
@@ -34,6 +35,9 @@ Route::middleware(['auth'])->group(function (){
             Route::post('add', [DriverController::class, 'store'])->name('driver.store');
             Route::post('update/{driver}', [DriverController::class, 'update'])->name('driver.update');
             Route::post('/', [DriverController::class, 'status'])->name('driver.status');
+
+            Route::get('map', [DriverController::class, 'map'])->name('driver.map');
+            Route::get('getalldrivers', [DriverController::class, 'getAllDrivers'])->name('driver.getdrivers');
         });
 
         Route::group(['prefix' => 'vehicles'], function (){

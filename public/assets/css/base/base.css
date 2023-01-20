@@ -676,3 +676,7 @@ ul {
 .hp-card-8 {
   min-height: 656px;
 }
+.btn-check:checked + .btn-primary:focus, .btn-check:active + .btn-primary:focus, .btn-primary:active:focus, .btn-primary.active:focus, .show > .btn-primary.dropdown-toggle:focus
+{
+  box-shadow: none;
+}

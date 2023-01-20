@@ -31,6 +31,7 @@ return new class extends Migration
             $table->string('capacity')->nullable();
             $table->string('dimension')->nullable();
 
+            $table->integer('zipcode')->nullable();
             $table->string('location')->nullable();
             $table->string('latitude')->nullable();
             $table->string('longitude')->nullable();

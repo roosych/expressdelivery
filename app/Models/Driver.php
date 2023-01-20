@@ -17,6 +17,7 @@ class Driver extends Model
         'status',
         'capacity',
         'dimension',
+        'zipcode',
         'location',
         'latitude',
         'longitude',

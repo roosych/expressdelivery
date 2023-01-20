@@ -67,7 +67,7 @@
                                     </div>
 
                                     <div class="col">
-                                        <h3 class="mb-4 mt-8">4</h3>
+                                        <h3 class="mb-4 mt-8">{{$users}}</h3>
                                         <p class="hp-p1-body mb-0 text-black-80 hp-text-color-dark-30">Users</p>
                                     </div>
                                 </div>
@@ -86,7 +86,7 @@
                                     </div>
 
                                     <div class="col">
-                                        <h3 class="mb-4 mt-8">3</h3>
+                                        <h3 class="mb-4 mt-8">{{$vehicle_types}}</h3>
                                         <p class="hp-p1-body mb-0 text-black-80 hp-text-color-dark-30">Vehicle types</p>
                                     </div>
                                 </div>
@@ -95,10 +95,7 @@
                     </div>
 
                 </div>
-
-
             </div>
-
 
         </div>
     </div>

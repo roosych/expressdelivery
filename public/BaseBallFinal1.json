@@ -1,0 +1,46 @@
+{
+	"type":"FeatureCollection",
+	"features":[
+		{
+			"type":"Feature",
+			"properties":{
+				"id":"1",
+				"name":"John",
+				"service":false,
+				"lat":45.568478,
+				"long":-122.044593,
+				"phone":"+994504801517",
+				"city":"Cascade Locks",
+				"zip":97014
+			},
+			"geometry":{
+				"type":"Point",
+				"coordinates":[
+					-122.044593,
+					45.568478
+				]
+			}
+		},
+
+		{
+			"type":"Feature",
+			"properties":{
+				"id":"1",
+				"name":"Lilly",
+				"service":true,
+				"lat":42.26352,
+				"long":-104.22425,
+				"phone":"+994504801517",
+				"city":"Cascade Locks",
+				"zip":97014
+			},
+			"geometry":{
+				"type":"Point",
+				"coordinates":[
+					-104.22425,
+					42.26352
+				]
+			}
+		}
+	]
+}

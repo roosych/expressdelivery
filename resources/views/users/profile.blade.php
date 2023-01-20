@@ -11,7 +11,7 @@
                     <div class="col-12">
                         <div class="row g-16 align-items-center justify-content-start">
                             <div class="col hp-flex-none w-auto">
-                                <a href="{{route('dashboard.index')}}" class="btn btn-primary w-100">
+                                <a href="{{url()->previous()}}" class="btn btn-primary w-100">
                                     <i class="ri-arrow-left-s-line remix-icon"></i>
                                     <span>Dashboard</span>
                                 </a>
@@ -34,7 +34,7 @@
                                         </div>
 
                                         <div class="col-12 col-md-6 hp-profile-action-btn text-end">
-                                            <a href="#" class="btn btn-ghost btn-primary">Edit</a>
+                                            <a href="{{route('user.edit', \Illuminate\Support\Facades\Auth::id())}}" class="btn btn-ghost btn-primary">Edit</a>
                                         </div>
 
                                         <div class="col-12 hp-profile-content-list mt-8 pb-0">

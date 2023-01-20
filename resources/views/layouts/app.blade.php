@@ -36,6 +36,8 @@
     <!-- Customizer -->
     <link rel="stylesheet" type="text/css" href="{{asset('assets/css/layouts/customizer.css')}}">
 
+    @stack('css')
+
     <title>@yield('title')</title>
 
 </head>

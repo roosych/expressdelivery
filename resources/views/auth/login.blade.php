@@ -93,7 +93,7 @@
                     @csrf
                     <div class="mb-16">
                         <label for="loginEmail" class="form-label">Email :</label>
-                        <input type="email" name="email" class="form-control" id="loginEmail">
+                        <input type="email" name="email" {{ old('email') }} class="form-control" id="loginEmail">
                     </div>
 
                     <div class="mb-16">

@@ -60,7 +60,7 @@ setTimeout(() => {
 }, 300);
 
 // Input Mask
-$('#phone').mask('(000) 000-0000');
+//$('#phone').mask('(000) 000-0000'); //TODO add to driver add an edit blade
 
 // Tooltip
 let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))

@@ -68,7 +68,6 @@ class UserController extends Controller
 
     public function delete($id)
     {
-
         User::destroy($id);
 
         return redirect()->route('users.index');

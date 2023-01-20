@@ -125,6 +125,9 @@ return [
 
     'cipher' => 'AES-256-CBC',
 
+    // zipcode app key
+    'zipcode_key' => env('ZIPCODE_APP_KEY'),
+
     /*
     |--------------------------------------------------------------------------
     | Maintenance Mode Driver

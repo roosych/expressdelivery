@@ -39,6 +39,7 @@
                                 <tr>
                                     <th>Name</th>
                                     <th>Phone</th>
+                                    <th>Location</th>
                                     <th>Vehicle</th>
                                     <th>Dimension</th>
                                     <th>Capacity</th>
@@ -53,6 +54,7 @@
                                 <tr>
                                     <td>{{$driver->fullname}}</td>
                                     <td>{{$driver->phone}}</td>
+                                    <td>{{$driver->location}}</td>
                                     <td>{{$driver->vehicle_type->name}}</td>
                                     <td>{{$driver->dimension}}</td>
                                     <td>{{$driver->capacity}}</td>
