@@ -1,61 +1,64 @@
 
-@extends('layouts.app')
+@extends('layouts.app-horizontal')
 
 @section('title', 'Map - Express Delivery PRO')
 
 @section('content')
-    <div class="hp-main-layout-content">
-        <div class="row mb-32 gy-32">
+    <div class="row mb-32 gy-32">
             <div class="col-12">
                 <div id="wrapper">
-                    <div class="row">
-                        <div class="col-lg-2">
-                            <div class="input-group">
-                                <select id="miles" class="form-select" aria-label="Radius">
-                                    <option value='50'>50 miles</option>
-                                    <option value='100'>100 mile</option>
-                                    <option value='150'>150 miles</option>
-                                    <option value='200'>200 miles</option>
-                                    <option value='300'>300 miles</option>
-                                    <option value='500'>500 miles</option>
-                                </select>
-                            </div>
-                        </div>
 
-                        <div class="col-lg-3">
-                            <div class="input-group">
-                                <input id="zipCodeInput" value="" type="text" class="form-control" placeholder="Zip code">
-                                <div class="input-group-append">
-                                    <button id="checkBtn" class="btn btn-primary" type="button" onclick="checkZip()" style="border-top-left-radius: 0;border-bottom-left-radius: 0;width: 120px">Drop pin</button>
+                    <style>
+                        .results_block {
+                            height: 600px;
+                            overflow-y: scroll;
+                        }
+                        .driver_card__title {
+                            font-size: 11px;
+                            font-weight: 600;
+                            margin-bottom: 5px;
+                        }
+                        .driver_card__text {
+                            font-size: 11px;
+                            margin-bottom: 5px;
+                        }
+                    </style>
+
+                    <div class="row">
+                        <div class="col-lg-4 results_block">
+                            <div class="">
+                                <div class="mx-8">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+
+                                            <div class="input-group">
+                                                <div class="col-12">
+                                                    <div id="findbox"></div>
+                                                </div>
+
+                                            </div>
+
+
+                                            <div class="input-group mt-24">
+                                                <div class="col-4">
+                                                    <select id="miles" class="form-select mb-8" aria-label="Radius">
+                                                        <option value='150'>150 miles</option>
+                                                        <option value='200'>200 miles</option>
+                                                        <option value='300' selected>300 miles</option>
+                                                        <option value='600'>600 miles</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="drivers_list"></div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="row pb-16 pt-24">
-                        <div class="col-lg-3 col-12">
-                            <span class="text-danger">red</span> - Сar in service
-                        </div>
-                        <div class="col-lg-3 col-12">
-                            <span class="text-primary">blue</span> - Сar is available
-                        </div>
-                        <div class="col-lg-3 col-12">
-                            <span class="text-success">green</span> - Сar in radius
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-lg-9">
+                        <div class="col-lg-8 p-0">
                             <div id="map"></div>
-                        </div>
-
-                        <div class="col-lg-3">
-                            <div class="card hp-contact-card mb-32 rounded border border-black-40 hp-border-color-dark-80 bg-black-0 hp-bg-color-dark-100">
-                                <div class="card-body">
-                                    <h4>Drivers within range</h4>
-                                    <table  id="myTable"></table>
-                                </div>
-                            </div>
                         </div>
                     </div>
 
@@ -64,23 +67,28 @@
             </div>
 
         </div>
-    </div>
 @endsection
 <style>
     #map {
         width: 100%;
-        height: 450px;
+        height: 600px;
+    }
+    .offcanvas-end {
+        width: 40% !important;
+    }
+    .geocoder-control-input {
+        width: 100px;
     }
 </style>
 @push('css')
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
+    <link rel="stylesheet" href="{{asset('assets/css/leaflet.css')}}">
+    <link rel="stylesheet" href="{{asset('assets/css/esri-leaflet-geocoder.css')}}">
 @endpush
 
 @push('js')
-    <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
-
-
-
+    <script src="{{asset('assets/js/leaflet.js')}}"></script>
+    <script src="{{asset('assets/js/esri-leaflet.js')}}"></script>
+    <script src="{{asset('assets/js/esri-leaflet-geocoder.js')}}"></script>
 
 
     <script>
@@ -91,36 +99,47 @@
 
         let map = L.map('map').setView([39.0, -98.26], 4);
 
-        let osm = new L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png',{
-            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'});
-
-        // https: also suppported.
-        let Esri_WorldGrayCanvas = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
-            attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
-            maxZoom: 16
+        let searchControl = L.esri.Geocoding.geosearch({
+            zoomToResult: false,
         }).addTo(map);
 
-        // https: also suppported.
-        let Stamen_TopOSMFeatures = L.tileLayer('http://stamen-tiles-{s}.a.ssl.fastly.net/toposm-features/{z}/{x}/{y}.{ext}', {
-            attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-            subdomains: 'abcd',
-            minZoom: 0,
-            maxZoom: 20,
-            ext: 'png',
-            bounds: [[22, -132], [51, -56]],
-            opacity: 0.9
+        document.getElementById('findbox').appendChild(
+            document.querySelector(".geocoder-control")
+        );
+
+        console.log(searchControl);
+
+        let results = L.layerGroup().addTo(map);
+
+        searchControl.on('results', function (data) {
+            results.clearLayers();
+
+            ProcessClick(data.results[0].latlng.lat, data.results[0].latlng.lng);
+            //results.addLayer(L.marker(data.results[i].latlng)); // add marker
+
+            //console.log(L.marker(data.results[0].latlng.lat, data.results[0].latlng.lng));
+
+            //results.addLayer(L.marker(data.results[i].latlng)); // add marker
+
+            results.clearLayers();
         });
 
-        let OpenStreetMap_BlackAndWhite = L.tileLayer('http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png', {
-            maxZoom: 18,
-            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        });
-        //OpenStreetMap_BlackAndWhite.addTo(map);
+        //https: also suppported.
+        // let cartocdn = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        //     attribution: '&copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
+        //     maxZoom: 16,
+        //     tileSize: 512,
+        //     zoomOffset: -1,
+        // }).addTo(map);
 
-        let blue = L.layerGroup([
-            Esri_WorldGrayCanvas,
-            Stamen_TopOSMFeatures
-        ]);
+        let cartocdn = L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/dark-v10/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoicnVzbGFuaWFzIiwiYSI6ImNsZHdzbjA1NTA5ZXkzb3AweXUzcWhmbHAifQ.XW1kq9eYfqPlM_SAfVp2Dw', {
+            attribution: '&copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
+            maxZoom: 16,
+            tileSize: 512,
+            zoomOffset: -1,
+            accessToken: 'pk.eyJ1IjoicnVzbGFuaWFzIiwiYSI6ImNsZHdzbjA1NTA5ZXkzb3AweXUzcWhmbHAifQ.XW1kq9eYfqPlM_SAfVp2Dw'
+        }).addTo(map);
+
 
         // Set function for color ramp
         function getColor(service){
@@ -148,17 +167,13 @@
 
         // Get GeoJSON data and create features.
         $.getJSON(url, function(data) {
-
             //console.log(data);
-
             carDriver = L.geoJson(data, {
 
                 pointToLayer: function(feature, latlng) {
 
-                    console.log(feature.properties);
-
                     return L.circleMarker(latlng, {
-                        radius:6,
+                        radius:4,
                         opacity: .5,
                         color:getColor(feature.properties.service),
                         fillColor:  getColor(feature.properties.service),
@@ -193,16 +208,6 @@
             }).addTo(map);
         });
 
-        //////////////////////////
-        let baseMaps = {
-            "Gray":Esri_WorldGrayCanvas,
-            "OSM B&W":OpenStreetMap_BlackAndWhite,
-        };
-
-        let overlayMaps = {};
-        //Add layer control
-        L.control.layers(baseMaps, overlayMaps).addTo(map);
-
         map.on('click',function(e){
             lat = e.latlng.lat;
             lon = e.latlng.lng;
@@ -214,9 +219,15 @@
             ProcessClick(lat,lon)
         }
 
-        function ProcessClick(lat,lon){
-            console.log("You clicked the map at LAT: "+ lat+" and LONG: "+lon );
+        //marker icon
+        let flag = L.icon({
+            iconUrl: '{{asset('assets/img/flag_marker.png')}}',
+            iconSize:     [48, 48], // size of the icon
+            iconAnchor:   [22, 48], // point of the icon which will correspond to marker's location
+            popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+        });
 
+        function ProcessClick(lat,lon){
             //Clear existing marker, circle, and selected points if selecting new points
             if (theCircle !== undefined) {
                 map.removeLayer(theCircle);
@@ -229,7 +240,7 @@
             }
 
             //Add a marker to show where you clicked.
-            theMarker = L.marker([lat,lon]).addTo(map);
+            theMarker = L.marker([lat,lon], {icon: flag}).addTo(map);
             SelectPoints(lat,lon);
         }
 
@@ -243,7 +254,7 @@
             let theRadius = parseInt(dist) * 1609.34 ; //1609.34 meters in a mile
             //dist is a string so it's convered to an Interger.
 
-            selPts.length =0;  //Reset the array if selecting new points
+            selPts.length = 0;  //Reset the array if selecting new points
 
             carDriver.eachLayer(function (layer) {
                 // Lat, long of current point as it loops through.
@@ -258,20 +269,20 @@
                 }
             });
 
+
             // draw circle to see the selection area
-            theCircle = L.circle(xy, theRadius , {   /// Number is in Meters
-                color: 'orange',
-                fillOpacity: 0,
-                opacity: 1
-            }).addTo(map);
+            // theCircle = L.circle(xy, theRadius , {   /// Number is in Meters
+            //     color: 'orange',
+            //     fillOpacity: 0,
+            //     opacity: 1
+            // }).addTo(map);
 
             //Symbolize the Selected Points
             geojsonLayer = L.geoJson(selPts, {
 
                 pointToLayer: function(feature, latlng) {
-                    console.log('point to layer');
                     return L.circleMarker(latlng, {
-                        radius: 4, //expressed in pixels circle size
+                        radius: 2, //expressed in pixels circle size
                         color: "#39D01A",
                         stroke: true,
                         weight: 7,		//outline width  increased width to look like a filled circle.
@@ -286,73 +297,108 @@
             let GeoJS = { type: "FeatureCollection",  features: selPts   };
 
             //Show number of selected features.
-            console.log(GeoJS.features.length +" Selected features");
+            //console.log(GeoJS.features.length +" Selected features");
 
             // show selected GEOJSON data in console
-            console.log(JSON.stringify(GeoJS));
+            //console.log(JSON.stringify(GeoJS));
 
             //////////////////////////////////////////
 
             //Clean up prior records
-            $("#myTable tr").remove();
+            //$("#myTable tr").remove();
 
-            let table = document.getElementById("myTable");
-            //Add the header row.
-            let row = table.insertRow(-1);
-            // var headerCell = document.createElement("th");
-            // headerCell.innerHTML = "Drivers";
-            // row.appendChild(headerCell);
 
-            //Add the data rows.
-            //console.log(selPts);
+            let driverList = document.querySelector('.drivers_list');
+
+
+            driverList.innerHTML = '';
+
             for (let i = 0; i < selPts.length; i++) {
-                //console.log(selPts[i].properties.fullname);
-                row = table.insertRow(-1);
-                let cell = row.insertCell(-1);
 
-                cell.innerHTML = selPts[i].properties.fullname;
+                // Distance between marker and driver in miles
+                let toDriver = [parseFloat(selPts[i].properties.latitude), parseFloat(selPts[i].properties.longitude)];
+                let distance = map.distance(toDriver, xy);
+                let miles_to_driver = Math.round((distance.toFixed(0)/1000) / 1.609);
+
+
+                let equip = '';
+
+                for (let j = 0; j < selPts[i].properties.equipments.length; j++)
+                {
+                    equip += '<span class="badge hp-text-color-black-100 hp-bg-info-3 px-8 me-4 border-0">'+ selPts[i].properties.equipments[j] +'</span>';
+                }
+
+                driverList.innerHTML += '<div class="card hp-contact-card mb-16 p-16 rounded border border-black-40 hp-border-color-dark-80 bg-black-0 hp-bg-color-dark-100">\n' +
+                    '<div class="c">\n' +
+                    '<div class="row">\n' +
+                    '<div class="col-12">\n' +
+                    '<div class="row align-items-start justify-content-between">\n' +
+                    '<div class="driver_card" data-id="' + selPts[i].properties.id + '" data-name="' + selPts[i].properties.fullname + '"><h5 class=" hp-cursor-pointer mb-8">'+selPts[i].properties.id + ' ' + selPts[i].properties.fullname +'</h5></div>\n' +
+                    '</div>\n' +
+                    '</div>\n' +
+                    '\n' +
+                    '<div class="col-12">\n' +
+                    '<div class="row g-16 justify-content-between">\n' +
+                    '<div class="col-12">\n' +
+                    '<div class="row justify-content-between">\n' +
+                    '<div class="col hp-flex-none w-auto">\n' +
+                    '<div class="row g-8 ">\n' +
+                    '<div class="col hp-flex-none w-auto">\n' +
+                    '<p class="driver_card__title">Location:</p>\n' +
+                    '<p class="driver_card__title">Dimensions:</p>\n' +
+                    '<p class="driver_card__title">Capacity:</p>\n' +
+                    '<p class="driver_card__title">Status:</p>\n' +
+                    '<p class="driver_card__title">Equipment:</p>\n' +
+                    '<p class="driver_card__title">Note:</p>\n' +
+                    '</div>\n' +
+                    '\n' +
+                    '<div class="col hp-flex-none w-auto px-0">\n' +
+                    '<p class="driver_card__text">'+ selPts[i].properties.location +'</p>\n' +
+                    '<p class="driver_card__text">'+ selPts[i].properties.dimension +'</p>\n' +
+                    '<p class="driver_card__text">'+ selPts[i].properties.capacity +'</p>\n' +
+                    '<p class="driver_card__text">Resident</p>\n' +
+                    '<p class="driver_card__text"><span class="text-primary">'+ equip +'</span></p>\n' +
+                    '<p class="driver_card__text">'+ selPts[i].properties.note +'</p>\n' +
+                    '</div>\n' +
+                    '</div>\n' +
+                    '</div>\n' +
+                    '\n' +
+                    '<div class="col hp-flex-none w-auto text-center">\n' +
+                    '<h5>'+ miles_to_driver + ' mi' +'</h5>\n' +
+                    '<p class="hp-p1-body"><span class="badge hp-text-color-black-100 hp-bg-success-3 px-8 border-0">'+ selPts[i].properties.vehicle_type +'</span></p>\n' +
+                    '<a href="#" class="photo-icon" data-id="' + selPts[i].properties.id + '" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">\n' +
+                    '<i class="hp-text-color-dark-0 iconly-Light-Camera"></i>\n' +
+                    '</a>\n' +
+                    '</div>\n' +
+                    '</div>\n' +
+                    '</div>\n' +
+                    '\n' +
+                    '</div>\n' +
+                    '</div>\n' +
+                    '</div>\n' +
+                    '</div>\n' +
+                    '\n' +
+                    '</div>\n';
+
+                $('.photo-icon').click(function () {
+                    //console.log($(this).html());
+                    console.log($(this).attr('data-id'));
+                    $('#driver_id').html($(this).attr('data-id'));
+                });
             }
+
             //Get the Driver name in the cell.
-            $('#myTable tr').click(function() {
-                let theDriver = (this.getElementsByTagName("td").item(0)).innerHTML;
-
-                map._layers[theDriver].fire('click');
-                let coords = map._layers[theDriver]._latlng;
-
-                map.setView(coords, 5);
+            $('.driver_card').click(function () {
+                let driver = $(this).attr('data-name');
+                map._layers[driver].fire('click');
+                let coords = map._layers[driver]._latlng;
+                map.setView(coords, 4);
             });
 
         }	//end of SelectPoints function
 
     </script>
 
-    <script>
-        function checkZip() {
-
-            const api_key = '{{config('app.zipcode_key')}}';
-            const zip_code = $('#zipCodeInput').val();
-
-            $('#checkBtn')
-                .attr('disabled', true)
-                .html('<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>');
-
-            $.ajax({
-                method: "GET",
-                url: "https://www.zipcodeapi.com/rest/"+api_key+"/info.json/"+zip_code+"/degrees",
-                success: (result) => {
-                    dropPin(result['lat'], result['lng']);
-                    $('#checkBtn')
-                        .attr('disabled', false)
-                        .html('Drop pin');
-                    $('#zipCodeInput').val('');
-                },
-                error: (error) => {
-                    $('#checkBtn')
-                        .attr('disabled', false)
-                        .html('Drop pin');
-                    console.log(error.status);
-                }
-            });
-        }
-    </script>
 @endpush
+
+@include('parts.car_photo_modal')

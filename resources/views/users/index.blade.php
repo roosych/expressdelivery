@@ -1,9 +1,8 @@
-@extends('layouts.app')
+@extends('layouts.app-horizontal')
 
 @section('title', 'Users - Express Delivery PRO')
 
 @section('content')
-    <div class="hp-main-layout-content">
         <div class="row mb-32 gy-32">
             @if(auth()->user()->role == 10)
                 <div class="col-12">
@@ -85,7 +84,6 @@
             </div>
         </div>
 
-    </div>
 @endsection
 
 @push('js')

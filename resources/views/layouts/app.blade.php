@@ -75,7 +75,7 @@
                 <div class="col">
                     <div class="row align-items-center">
 
-                        <div class="w-auto ms-8 px-0 hp-sidebar-hidden mt-4">
+                        <div class="w-auto ms-8 px-0 hp-sidebar-hidden mt-4" style="font-size: 12px;">
                             Coding by <a href="https://t.me/ruslankandiba" target="_blank" class="hp-badge-text fw-normal hp-text-color-dark-30">Roosych</a>
                         </div>
                     </div>

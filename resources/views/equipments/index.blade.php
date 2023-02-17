@@ -1,6 +1,6 @@
 @extends('layouts.app-horizontal')
 
-@section('title', 'Vehicle types - Express Delivery PRO')
+@section('title', 'Equipments - Express Delivery PRO')
 
 @section('content')
     <div class="row mb-32 gy-32">
@@ -11,9 +11,9 @@
                         <div class="row g-16 align-items-center justify-content-end">
 
                             <div class="col hp-flex-none w-auto">
-                                <a href="{{route('vehicle.add')}}" class="btn btn-primary w-100">
+                                <a href="{{route('equipment.add')}}" class="btn btn-primary w-100">
                                     <i class="ri-add-line remix-icon"></i>
-                                    <span>Add New Type</span>
+                                    <span>Add New</span>
                                 </a>
                             </div>
                         </div>
@@ -35,27 +35,20 @@
                             <table class="table align-middle table-hover table-borderless">
                                 <thead>
                                 <tr>
-                                    <th>Type</th>
+                                    <th>Name</th>
                                     <th>Drivers</th>
-                                    <th>Status</th>
                                     <th></th>
                                 </tr>
                                 </thead>
 
                                 <tbody>
 
-                                @foreach($vehicle_types as $type)
+                                @foreach($equipments as $item)
                                 <tr>
-                                    <td>{{$type->name}}</td>
-                                    <td>{{$type->drivers->count()}}</td>
+                                    <td>{{$item->name}}</td>
+                                    <td>{{$item->drivers->count()}}</td>
                                     <td class="text-end">
-                                        <div class="form-check form-switch text-center">
-                                            <input class="form-check-input" type="checkbox"  data-id="{{$type->id}}" id="{{$type->id}}" {{$type->status ? 'checked' : ''}}>
-                                            <label class="form-check-label" for="{{$type->id}}"></label>
-                                        </div>
-                                    </td>
-                                    <td class="text-end">
-                                        <a href="{{route('vehicle.edit', $type->id)}}">
+                                        <a href="{{route('equipment.edit', $item->id)}}">
                                             <i class="iconly-Light-EditSquare hp-cursor-pointer hp-transition hp-hover-text-color-warning-1 text-black-80" style="font-size: 24px;margin-right: 10px;"></i>
                                         </a>
                                         <a href="#">
@@ -66,10 +59,6 @@
                                 @endforeach
                                 </tbody>
                             </table>
-                        </div>
-
-                        <div class="container">
-                            {{$vehicle_types->links()}}
                         </div>
 
                     </div>

@@ -14,8 +14,16 @@
             <li>
                 <a href="{{route('drivers.index')}}">
                     <span>
-                        <i class="hp-text-color-dark-0 ri-2x ri-aliens-line"></i>
+                        <i class="hp-text-color-dark-0 ri-2x ri-steering-2-line"></i>
                         <span>Drivers</span>
+                    </span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <span>
+                        <i class="hp-text-color-dark-0 ri-2x ri-aliens-line"></i>
+                        <span>Owners</span>
                     </span>
                 </a>
             </li>
@@ -50,8 +58,17 @@
             <li>
                 <a href="{{route('vehicles.index')}}">
                     <span>
-                        <i class="hp-text-color-dark-0 ri-2x ri-settings-line"></i>
+                        <i class="hp-text-color-dark-0 ri-2x ri-space-ship-line"></i>
                         <span>Vehicle types</span>
+                    </span>
+                </a>
+            </li>
+
+            <li>
+                <a href="#">
+                    <span>
+                        <i class="hp-text-color-dark-0 ri-2x ri-shield-line"></i>
+                        <span>Equipment</span>
                     </span>
                 </a>
             </li>

@@ -1,7 +1,7 @@
 /* Sider */
-.hp-logo {
-  height: 45px;
-}
+/*.hp-logo {*/
+/*  height: 45px;*/
+/*}*/
 
 body.collapsed-active .hp-main-layout {
   max-width: calc(100% - 80px);
@@ -99,8 +99,8 @@ body.collapse-btn-none.collapsed-active .hp-sidebar-collapse-button {
 
 .hp-sidebar {
   -webkit-box-flex: 0;
-      -ms-flex: 0 0 316px;
-          flex: 0 0 316px;
+      -ms-flex: 0 0 216px;
+          flex: 0 0 216px;
   height: 100vh;
   position: sticky;
   top: 0;

@@ -1,6 +1,6 @@
 @extends('layouts.app-horizontal')
 
-@section('title', 'Vehicle types - Express Delivery PRO')
+@section('title', 'Owners - Express Delivery PRO')
 
 @section('content')
     <div class="row mb-32 gy-32">
@@ -11,9 +11,9 @@
                         <div class="row g-16 align-items-center justify-content-end">
 
                             <div class="col hp-flex-none w-auto">
-                                <a href="{{route('vehicle.add')}}" class="btn btn-primary w-100">
+                                <a href="{{route('owner.add')}}" class="btn btn-primary w-100">
                                     <i class="ri-add-line remix-icon"></i>
-                                    <span>Add New Type</span>
+                                    <span>Add Owner</span>
                                 </a>
                             </div>
                         </div>
@@ -35,7 +35,9 @@
                             <table class="table align-middle table-hover table-borderless">
                                 <thead>
                                 <tr>
-                                    <th>Type</th>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Phone</th>
                                     <th>Drivers</th>
                                     <th>Status</th>
                                     <th></th>
@@ -44,9 +46,11 @@
 
                                 <tbody>
 
-                                @foreach($vehicle_types as $type)
+                                @foreach($owners as $type)
                                 <tr>
+                                    <td>{{$type->id}}</td>
                                     <td>{{$type->name}}</td>
+                                    <td>{{$type->phone}}</td>
                                     <td>{{$type->drivers->count()}}</td>
                                     <td class="text-end">
                                         <div class="form-check form-switch text-center">
@@ -55,7 +59,7 @@
                                         </div>
                                     </td>
                                     <td class="text-end">
-                                        <a href="{{route('vehicle.edit', $type->id)}}">
+                                        <a href="{{route('owner.edit', $type->id)}}">
                                             <i class="iconly-Light-EditSquare hp-cursor-pointer hp-transition hp-hover-text-color-warning-1 text-black-80" style="font-size: 24px;margin-right: 10px;"></i>
                                         </a>
                                         <a href="#">
@@ -66,10 +70,6 @@
                                 @endforeach
                                 </tbody>
                             </table>
-                        </div>
-
-                        <div class="container">
-                            {{$vehicle_types->links()}}
                         </div>
 
                     </div>
@@ -85,7 +85,7 @@
             let status;
             this.checked ? status = 1 : status = 0;
 
-            $.post('{{route('vehicle.status')}}', {id: this.id, status: status, _token: token});
+            $.post('{{route('owner.status')}}', {id: this.id, status: status, _token: token});
         });
     </script>
 @endpush

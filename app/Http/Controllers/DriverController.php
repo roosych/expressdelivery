@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreDriverRequest;
 use App\Http\Requests\UpdateDriverRequest;
 use App\Models\Driver;
+use App\Models\Equipment;
+use App\Models\Owner;
 use App\Models\VehicleType;
 use http\Env\Response;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use function Symfony\Component\String\length;
 
@@ -15,7 +18,10 @@ class DriverController extends Controller
 {
     public function index()
     {
-        $drivers = Driver::query()->get();
+        $drivers = Driver::query()
+            ->with(['vehicle_type', 'owner'])
+            ->orderBy('created_at', 'desc')
+            ->get();
         return view('drivers.index', compact('drivers'));
     }
 
@@ -25,18 +31,42 @@ class DriverController extends Controller
             ->where('status', true)
             ->get();
 
-        return view('drivers.add', compact('vehicle_types'));
+        $equipment = Equipment::query()->get();
+        $owners = Owner::query()->get();
+
+        return view('drivers.add', compact('vehicle_types', 'equipment', 'owners'));
     }
 
     public function store(StoreDriverRequest $request)
     {
         $data = $request->validated();
 
-        //dd($data);
+        if (!$request->has('equipment'))
+        {
+            $data['equipment'] = [];
+        }
 
-        Driver::query()->create($data);
+        // из-за того что затрагиваются две модели (водитель и экипировка), страхуемся транзакциями
+        DB::beginTransaction();
+
+        try {
+            $driver = Driver::query()->create($data);
+
+            $driver->equipment()->sync($data['equipment']);
+
+            DB::commit();
+        }
+
+        catch (\Exception $e) {
+
+            DB::rollback();
+
+            return redirect()->back()->with('error', 'Something went wrong!');
+
+        }
 
         return redirect()->route('drivers.index')->with('success', 'Successfully added!');
+
     }
 
     public function status(Request $request)
@@ -58,16 +88,25 @@ class DriverController extends Controller
             ->where('status', true)
             ->get();
 
-        return view('drivers.edit', compact('driver', 'vehicle_types'));
+        $equipment = Equipment::query()->get();
+        $owners = Owner::query()->get();
+
+        return view('drivers.edit', compact('driver', 'vehicle_types', 'equipment', 'owners'));
     }
 
     public function update(UpdateDriverRequest $request, Driver $driver)
     {
         $data = $request->validated();
 
+        $driver->equipment()->sync($request['equipment']);
+
+        //dd($data);
+
         Driver::query()->where('id', $driver->id)->update($data);
 
-        return redirect()->route('drivers.index')->with('success', 'Successfully edited!');
+
+
+        return redirect()->back()->with('success', 'Successfully edited!');
     }
 
     public function map()
@@ -91,6 +130,9 @@ class DriverController extends Controller
         foreach ($data as $item)
         {
             //dd($item);
+
+            $equipments = ['Straps', 'Air ride', 'Ramps'];
+
             array_push($res, [
                 "type" => "FeatureCollection",
                 "features" => [
@@ -109,6 +151,7 @@ class DriverController extends Controller
                             "dimension" => (string)$item['dimension'],
                             "vehicle_type" => (string)$item['vehicle_type']['name'],
                             "note" => (string)$item['note'],
+                            "equipments" => (array)$equipments,
                         ],
                         "geometry" => [
                             "type" => "Point",
@@ -122,7 +165,14 @@ class DriverController extends Controller
 
         $drivers = json_encode($res);
 
+        //dd($drivers);
+
         return $drivers;
+    }
+
+    public function images(Driver $driver)
+    {
+        return view('drivers.images', compact('driver'));
     }
 
 }

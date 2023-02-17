@@ -21,12 +21,30 @@ class Driver extends Model
         'location',
         'latitude',
         'longitude',
-        'note'
+        'future_zipcode',
+        'future_location',
+        'future_latitude',
+        'future_longitude',
+        'future_datetime',
+        'note',
+        'owner_id',
+        'citizenship',
+        'dnu',
     ];
 
     public function vehicle_type()
     {
         return $this->belongsTo(VehicleType::class);
+    }
+
+    public function equipment()
+    {
+        return $this->belongsToMany(Equipment::class);
+    }
+
+    public function owner()
+    {
+        return $this->belongsTo(Owner::class);
     }
 
 }
