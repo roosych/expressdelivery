@@ -10,9 +10,9 @@
                     <div class="col-12">
                         <div class="row g-16 align-items-center justify-content-start">
                             <div class="col hp-flex-none w-auto">
-                                <a href="{{route('drivers.index')}}" class="btn btn-primary w-100">
+                                <a href="{{ url()->previous() }}" class="btn btn-primary w-100">
                                     <i class="ri-arrow-left-s-line remix-icon"></i>
-                                    <span>All drivers</span>
+                                    <span>Back</span>
                                 </a>
                             </div>
                         </div>
@@ -48,7 +48,8 @@
 
                                         <div class="row">
                                             <div class="col-lg-3">
-                                                <input type="file" name="images[]" class="form-control mb-32">
+                                                <input type="file" name="images[]" class="form-control" multiple>
+                                                <p class="mt-10 mb-32">max: 2 MB (jpg, jpeg, png)</p>
                                             </div>
 
                                             <div class="col-lg-3">
@@ -58,22 +59,16 @@
 
 
                                         <div class="row">
-                                            <div class="col-lg-2">
-                                                <div class="card">
-                                                    <img src="https://yoda.hypeople.studio/yoda-admin-template/app-assets/img/product/watch-1.png" alt="" class="img-fluid">
-                                                    <div class="text-center mb-8">
-                                                        <button class="btn btn-sm btn-danger">Delete</button>
+                                            @foreach($driver->images as $image)
+                                                <div class="col-lg-2">
+                                                    <div class="card rounded-1">
+                                                        <img src="/storage/images/drivers/{{$driver->id}}/{{$image->filename}}" alt="" class="img-fluid">
+                                                        <div class="text-center mb-8 mt-8">
+                                                            <a href="{{route('image.delete', [$driver, $image])}}" onclick="confirm('Are you sure?')" class="btn btn-sm btn-danger delete_image" data-id="{{$image->id}}">Delete</a>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-lg-2">
-                                                <div class="card">
-                                                    <img src="https://yoda.hypeople.studio/yoda-admin-template/app-assets/img/product/watch-1.png" alt="" class="img-fluid">
-                                                    <div class="text-center mb-8">
-                                                        <button class="btn btn-sm btn-danger">Delete</button>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            @endforeach
                                         </div>
 
                                     </div>

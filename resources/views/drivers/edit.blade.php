@@ -10,9 +10,15 @@
                     <div class="col-12">
                         <div class="row g-16 align-items-center justify-content-start">
                             <div class="col hp-flex-none w-auto">
-                                <a href="{{route('drivers.index')}}" class="btn btn-primary w-100">
+                                <a href="{{ url()->previous() }}" class="btn btn-primary w-100">
                                     <i class="ri-arrow-left-s-line remix-icon"></i>
-                                    <span>All drivers</span>
+                                    <span>Back</span>
+                                </a>
+                            </div>
+                            <div class="col hp-flex-none w-auto">
+                                <a href="{{route('driver.images', $driver)}}" class="btn btn-warning w-100">
+                                    <i class="ri-camera-line remix-icon"></i>
+                                    <span>Vehicle photos</span>
                                 </a>
                             </div>
                         </div>
@@ -28,7 +34,7 @@
                             <div class="row g-32">
                                 <div class="col-12">
                                     <div class="p-16 p-sm-24">
-                                        <h4 class="mb-24">Edit driver "{{$driver->fullname}}"</h4>
+                                    <h4 class="mb-24">Edit driver "{{$driver->fullname}}"</h4>
 
                                         @if(session()->has('success'))
                                             <div class="alert alert-success">

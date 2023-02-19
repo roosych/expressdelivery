@@ -41,6 +41,8 @@ Route::middleware(['auth', 'activeuser'])->group(function (){
 
             Route::get('{driver}/images', [DriverController::class, 'images'])->name('driver.images');
             Route::post('{driver}/images', [ImageController::class, 'store'])->name('image.store');
+            Route::get('{driver}/images/{image}/delete/', [ImageController::class, 'delete'])->name('image.delete');
+            Route::get('getimages/{driver}', [DriverController::class, 'getDriverImages'])->name('driver.getImages');
 
 
             Route::get('map', [DriverController::class, 'map'])->name('driver.map');

@@ -35,7 +35,7 @@
                                 <thead>
                                 <tr>
                                     <th width="70">ID</th>
-                                    <th width="50">Status</th>
+                                    <th width="100">Availability</th>
                                     <th>Name</th>
 {{--
                                     <th>Phone</th>
@@ -79,15 +79,22 @@
                                             @endif
                                         </td>
                                         <td>
-                                            <div class="form-check form-switch text-center">
+                                            <div class="form-check form-switch">
                                                 <input class="form-check-input" name="service" type="checkbox"  data-id="{{$driver->id}}" id="{{$driver->id}}" {{$driver->service ? 'checked' : ''}}>
                                                 <label class="form-check-label" for="{{$driver->id}}"></label>
                                             </div>
+                                            @if($driver->future_datetime > now())
+                                                <span class="badge hp-text-color-black-100 hp-bg-danger-3 mt-4 px-8 border-0">
+                                                    {{ \Carbon\Carbon::parse($driver->future_datetime)->format('M d')}}<br>
+                                                    {{ \Carbon\Carbon::parse($driver->future_datetime)->format('H:m')}}
+                                                </span>
+
+                                            @endif
                                         </td>
                                         <td>
                                             {{$driver->fullname}}
                                             @if($driver->owner)
-                                            <br><b>Owner:</b> {{$driver->owner->id}}
+                                            <br><b>Owner:</b> {{$driver->owner->id}} - {{$driver->owner->name}}
                                             @endif
                                         </td>
 {{--
@@ -120,9 +127,9 @@
                                                     <a href="{{route('driver.edit', $driver)}}">
                                                         <i class="iconly-Light-EditSquare hp-cursor-pointer hp-transition hp-hover-text-color-primary-1 text-black-80" style="font-size: 24px;margin-right: 10px;"></i>
                                                     </a>
-                                                    <a href="#">
+                                                    {{--<a href="#">
                                                         <i class="iconly-Light-Delete hp-cursor-pointer hp-transition hp-hover-text-color-danger-1 text-black-80" style="font-size: 24px;"></i>
-                                                    </a>
+                                                    </a>--}}
                                                 </div>
                                         </td>
                                     </tr>
@@ -137,6 +144,8 @@
             </div>
         </div>
 @endsection
+
+@include('parts.future_available_modal')
 
 @push('css')
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.1/css/dataTables.bootstrap5.min.css">
@@ -195,6 +204,9 @@
         });
 
         $(".form-check-input").change(function() {
+
+            $('#future_ava_modal').modal('show');
+
             let token = $('meta[name="csrf-token"]').attr('content');
             let service;
             this.checked ? service = 1 : service = 0;

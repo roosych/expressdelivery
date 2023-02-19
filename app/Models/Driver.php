@@ -47,4 +47,9 @@ class Driver extends Model
         return $this->belongsTo(Owner::class);
     }
 
+    public function images()
+    {
+        return $this->hasMany(Image::class)->where('driver_id', $this->id);
+    }
+
 }

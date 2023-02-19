@@ -101,6 +101,8 @@
 
         let searchControl = L.esri.Geocoding.geosearch({
             zoomToResult: false,
+            collapseAfterResult: false,
+            expanded: true,
         }).addTo(map);
 
         document.getElementById('findbox').appendChild(
@@ -125,14 +127,14 @@
         });
 
         //https: also suppported.
-        // let cartocdn = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        //     attribution: '&copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
-        //     maxZoom: 16,
-        //     tileSize: 512,
-        //     zoomOffset: -1,
-        // }).addTo(map);
+        let cartocdn = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
+            maxZoom: 16,
+            tileSize: 512,
+            zoomOffset: -1,
+        }).addTo(map);
 
-        let cartocdn = L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/dark-v10/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoicnVzbGFuaWFzIiwiYSI6ImNsZHdzbjA1NTA5ZXkzb3AweXUzcWhmbHAifQ.XW1kq9eYfqPlM_SAfVp2Dw', {
+        let mapbox = L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/dark-v10/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoicnVzbGFuaWFzIiwiYSI6ImNsZHdzbjA1NTA5ZXkzb3AweXUzcWhmbHAifQ.XW1kq9eYfqPlM_SAfVp2Dw', {
             attribution: '&copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
             maxZoom: 16,
             tileSize: 512,
@@ -140,10 +142,20 @@
             accessToken: 'pk.eyJ1IjoicnVzbGFuaWFzIiwiYSI6ImNsZHdzbjA1NTA5ZXkzb3AweXUzcWhmbHAifQ.XW1kq9eYfqPlM_SAfVp2Dw'
         }).addTo(map);
 
+        //////////////////////////
+        var baseMaps = {
+            "CartoDB Dark": cartocdn,
+            "Mapbox Dark": mapbox,
+        };
+
+        var overlayMaps = {};
+        //Add layer control
+        L.control.layers(baseMaps, overlayMaps).addTo(map);
+        //////////////////////
 
         // Set function for color ramp
         function getColor(service){
-            return service ? 'red' : 'blue';
+            return service ? '#f32424' : '#27f1ea';
         }
 
         // Set style function that sets fill color property
@@ -169,9 +181,7 @@
         $.getJSON(url, function(data) {
             //console.log(data);
             carDriver = L.geoJson(data, {
-
                 pointToLayer: function(feature, latlng) {
-
                     return L.circleMarker(latlng, {
                         radius:4,
                         opacity: .5,
@@ -185,7 +195,7 @@
                     layer._leaflet_id = feature.properties.fullname;
 
                     let service = '';
-                    feature.properties.service ? service = '<span style="color: red">On service</span>' : service = '<span style="color: blue">Available</span>';
+                    feature.properties.service ? service = '<span style="color: #f32424">On service</span>' : service = '<span style="color: #27f1ea">Available</span>';
 
                     let popupContent = "<div style='font-size: 14px'>" +
                         "<span style='font-size:16px'><b>" + feature.properties.fullname + "</b></span>" + "</br>" +
@@ -320,7 +330,6 @@
                 let distance = map.distance(toDriver, xy);
                 let miles_to_driver = Math.round((distance.toFixed(0)/1000) / 1.609);
 
-
                 let equip = '';
 
                 for (let j = 0; j < selPts[i].properties.equipments.length; j++)
@@ -381,9 +390,38 @@
                     '</div>\n';
 
                 $('.photo-icon').click(function () {
-                    //console.log($(this).html());
-                    console.log($(this).attr('data-id'));
-                    $('#driver_id').html($(this).attr('data-id'));
+                    let driver = $(this).data('id');
+                    let url = "{{route('driver.getImages', '')}}" + "/" + driver;
+                    let photosBlock = document.querySelector('.car-photos');
+                    photosBlock.innerHTML = '<div class="text-center">\n' +
+                        '    <div class="spinner-border" role="status">\n' +
+                        '        <span class="visually-hidden">Loading...</span>\n' +
+                        '    </div>\n' +
+                        '</div>';
+
+                    $.ajax({
+                        url: url,
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function(response) {
+                            photosBlock.innerHTML = '';
+                            if(response.data.length > 0) {
+                                for (i = 0; i < response.data.length; i++) {
+                                    let filename = response.data[i]['filename'];
+                                    let img = '/storage/images/drivers/' + driver + '/' + filename + '';
+                                    photosBlock.innerHTML +=
+                                        '<div class="col-lg-4 col-12">\n' +
+                                        '<img class="my-12" src="'+ img +'">\n' +
+                                        '</div>';
+                                }
+
+                            }
+                        },
+                        error: function(e) {
+
+                        }
+                    });
+
                 });
             }
 

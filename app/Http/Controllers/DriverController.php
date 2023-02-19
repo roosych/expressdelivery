@@ -6,12 +6,14 @@ use App\Http\Requests\StoreDriverRequest;
 use App\Http\Requests\UpdateDriverRequest;
 use App\Models\Driver;
 use App\Models\Equipment;
+use App\Models\Image;
 use App\Models\Owner;
 use App\Models\VehicleType;
 use http\Env\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use function Nette\Utils\isEmpty;
 use function Symfony\Component\String\length;
 
 class DriverController extends Controller
@@ -173,6 +175,12 @@ class DriverController extends Controller
     public function images(Driver $driver)
     {
         return view('drivers.images', compact('driver'));
+    }
+
+    public function getDriverImages(Driver $driver)
+    {
+        $data = Image::query()->where('driver_id', $driver->id)->get();
+        return response()->json(['status' => 'success', 'data' => $data]);
     }
 
 }

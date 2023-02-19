@@ -16,31 +16,52 @@ class ImageController extends Controller
             'images.*' => ['required', 'image', 'mimes:jpeg,jpg,png', 'max:2048']
         ]);
 
-
-
         $files = $request->file('images');
+
+        //dd($files);
 
         if($request->hasFile('images'))
         {
-            foreach ($files as $file) {
+            foreach ($files as $key => $file) {
 
-                $imageName = time().'.'.$file->extension();
+                $extension = $file->getClientOriginalExtension();
 
-                //dd($imageName);
+                $fileName = time() .'-'. $key .'.'. $extension;
 
-                Storage::disk('public')->put('images/cars/' .$driver->id, $file);
+                $filePath = 'images/drivers/' .$driver->id . '/' . $fileName;
+
+                Storage::disk('public')->put($filePath, file_get_contents($file));
+
+                //полный путь
+                //$path = Storage::disk('public')->url($path);
 
                 $data = [
                     'driver_id' => $driver->id,
-                    'filename' => $imageName
+                    'filename' => $fileName
                 ];
 
                 Image::query()->create($data);
             }
+            return redirect()->back()->with('success', 'Successfully added!');
+        }
+        return false;
+    }
+
+    public function delete(Driver $driver, Image $image)
+    {
+        $file = Image::query()->findOrFail($image->id);
+
+        $absolutePath = 'storage/images/drivers/'.$driver->id. '/' . $image->filename;
+
+        if (file_exists($absolutePath)) {
+
+            unlink($absolutePath);
+            $file->delete();
 
             return redirect()->back()->with('success', 'Successfully added!');
         }
 
-        return false;
+        return redirect()->back()->with('danger', 'Something went wrong!');
+
     }
 }
