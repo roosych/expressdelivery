@@ -45,7 +45,7 @@ class UserController extends Controller
 
         User::query()->where('id', $user->id)->update($data);
 
-        return redirect()->route('users.index')->with('success', 'Successfully edited!');
+        return redirect()->back()->with('success', 'Successfully edited!');
     }
 
     public function status(Request $request)
@@ -66,10 +66,12 @@ class UserController extends Controller
         return view('users.profile');
     }
 
-    public function delete($id)
+    public function delete(User $user)
     {
-        User::destroy($id);
+        User::destroy($user->id);
 
-        return redirect()->route('users.index');
+        info('User deleted', ['deleted_user' => $user->email, 'deleted_by' => auth()->user()->name]);
+
+        return redirect()->route('users.index')->with('success', 'Successfully deleted!');
     }
 }

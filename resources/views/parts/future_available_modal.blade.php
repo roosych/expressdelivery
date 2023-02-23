@@ -1,19 +1,72 @@
 <div class="modal fade" id="future_ava_modal" tabindex="-1" aria-labelledby="future_ava_modalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="future_ava_modalLabel">Modal title</h5>
+                <h5 class="modal-title" id="future_ava_modalLabel">Availability</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <div class="modal-body">
-                <p>This is a vertically centered modal.</p>
+            <div class="modal-body pt-0">
+                <p class="text-warning">If you want to assign a future date and location, fill in the fields</p>
+
+                <form id="futureAvaForm">
+
+                    <div class="row justify-content-between">
+                    <div class="col-lg-5 col-12">
+                        <label for="zipcode" class="form-label">Future Zip Code</label>
+                        <input type="text" class="form-control" name="future_zipcode" id="zipcode">
+
+                        <div class="mt-12">
+                            <label for="location" class="form-label">Future Location</label>
+                            <input type="text" class="form-control" name="future_location" id="location" readonly="readonly">
+                        </div>
+
+                        <div class="mt-12">
+                            <label for="latitude" class="form-label">Future Latitude</label>
+                            <input type="text" class="form-control" name="future_latitude" id="latitude" readonly="readonly">
+                        </div>
+
+                        <div class="mt-12">
+                            <label for="longitude" class="form-label">Future Longitude</label>
+                            <input type="text" class="form-control" name="future_longitude" id="longitude" readonly="readonly">
+                        </div>
+
+                        <div id="errorMsg" class="alert alert-danger mt-16 p-8" hidden="hidden"></div>
+
+                        <div class="row mt-16">
+                            <div class="col-12 mt-16">
+                                <button id="checkBtn" class="btn btn-primary w-100" onclick="checkZip()">Fill coords</button>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-lg-6 col-12">
+                        <p class="form-label">Future Available Date</p>
+                        <input id="future_date" type="text" name="future_datetime" class="form-control">
+
+                        <div class="mt-12">
+                            <label for="note" class="form-label">Note</label>
+                            <textarea class="form-control" id="note" cols="30" rows="2" name="note"></textarea>
+                        </div>
+                    </div>
+
+                </div>
+
+                </form>
+                <div id="avaFormError" class="alert alert-danger mt-16 p-8" hidden="hidden">Something went wrong! Try again</div>
+
             </div>
 
-            <div class="modal-footer">
-                <button type="button" class="btn btn-text" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save futures</button>
+            <div class="modal-footer pt-0">
+                <button type="button" class="btn btn-info" data-bs-dismiss="modal">Only switch off availability</button>
+                <button id="setFutureAvaBtn" type="button" class="btn btn-primary btn-block" hidden="hidden">Save future availability data</button>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .perfect-datetimepicker {
+        width: 100% !important;
+    }
+</style>

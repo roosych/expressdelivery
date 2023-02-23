@@ -1,17 +1,16 @@
-@extends('layouts.app')
+@extends('layouts.app-horizontal')
 
 @section('title', 'Add User - Express Delivery PRO')
 
 @section('content')
-    <div class="hp-main-layout-content">
-        <div class="row mb-32 gy-32">
+    <div class="row mb-32 gy-32">
             <div class="col-12">
                 <div class="row justify-content-between gy-32">
 
                     <div class="col-12">
                         <div class="row g-16 align-items-center justify-content-start">
                             <div class="col hp-flex-none w-auto">
-                                <a href="{{route('users.index')}}" class="btn btn-primary w-100">
+                                <a href="{{ url()->previous() }}" class="btn btn-primary w-100">
                                     <i class="ri-arrow-left-s-line remix-icon"></i>
                                     <span>All users</span>
                                 </a>
@@ -85,6 +84,4 @@
                 </div>
             </div>
         </div>
-
-    </div>
 @endsection

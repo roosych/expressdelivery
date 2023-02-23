@@ -14,12 +14,12 @@
                             overflow-y: scroll;
                         }
                         .driver_card__title {
-                            font-size: 11px;
+                            font-size: 12px;
                             font-weight: 600;
                             margin-bottom: 5px;
                         }
                         .driver_card__text {
-                            font-size: 11px;
+                            font-size: 12px;
                             margin-bottom: 5px;
                         }
                     </style>
@@ -89,6 +89,7 @@
     <script src="{{asset('assets/js/leaflet.js')}}"></script>
     <script src="{{asset('assets/js/esri-leaflet.js')}}"></script>
     <script src="{{asset('assets/js/esri-leaflet-geocoder.js')}}"></script>
+    <script src="{{asset('assets/js/moment.js')}}"></script>
 
 
     <script>
@@ -97,12 +98,13 @@
         let theCircle;
         let geojsonLayer;
 
-        let map = L.map('map').setView([39.0, -98.26], 4);
+        let map = L.map('map').setView([39.0, -98.26], 5);
 
         let searchControl = L.esri.Geocoding.geosearch({
             zoomToResult: false,
             collapseAfterResult: false,
             expanded: true,
+            placeholder: 'Enter adress or zipcode',
         }).addTo(map);
 
         document.getElementById('findbox').appendChild(
@@ -143,19 +145,19 @@
         }).addTo(map);
 
         //////////////////////////
-        var baseMaps = {
+        let baseMaps = {
             "CartoDB Dark": cartocdn,
             "Mapbox Dark": mapbox,
         };
 
-        var overlayMaps = {};
+        let overlayMaps = {};
         //Add layer control
         L.control.layers(baseMaps, overlayMaps).addTo(map);
         //////////////////////
 
         // Set function for color ramp
         function getColor(service){
-            return service ? '#f32424' : '#27f1ea';
+            return service ? '#27f1ea' : '#f32424';
         }
 
         // Set style function that sets fill color property
@@ -195,7 +197,7 @@
                     layer._leaflet_id = feature.properties.fullname;
 
                     let service = '';
-                    feature.properties.service ? service = '<span style="color: #f32424">On service</span>' : service = '<span style="color: #27f1ea">Available</span>';
+                    feature.properties.service ? service = '<span style="color: #27f1ea">Available</span>' : service = '<span style="color: #f32424">Not available</span>';
 
                     let popupContent = "<div style='font-size: 14px'>" +
                         "<span style='font-size:16px'><b>" + feature.properties.fullname + "</b></span>" + "</br>" +
@@ -293,7 +295,7 @@
                 pointToLayer: function(feature, latlng) {
                     return L.circleMarker(latlng, {
                         radius: 2, //expressed in pixels circle size
-                        color: "#39D01A",
+                        color: "yellow",
                         stroke: true,
                         weight: 7,		//outline width  increased width to look like a filled circle.
                         fillOpcaity: 1
@@ -331,63 +333,118 @@
                 let miles_to_driver = Math.round((distance.toFixed(0)/1000) / 1.609);
 
                 let equip = '';
+                let future_datetime;
+
+                let future_timestamp = new Date(selPts[i].properties.future_datetime).getTime();
+
+                let future_format = moment(future_timestamp).format('MMM, DD h:hh A');
+
+                console.log(future_format);
+
+
+
+                if (selPts[i].properties.service === false && future_timestamp > Date.now()) {
+                    future_datetime = '<div class="badge hp-text-color-black-100 hp-bg-danger-3 px-8 mb-12 border-0" style="display: block;white-space: normal">' + future_format + '</div>';
+                } else {
+                    future_datetime = '';
+                }
+
+                let available = selPts[i].properties.service ?
+                    '<span class="text-success" style="font-size: 12px;">Available</span>' :
+                    '<span class="text-danger" style="font-size: 12px;">Not available</span>';
+
+                let dnu = selPts[i].properties.dnu ?
+                    '<span class="badge hp-text-color-black-100 hp-bg-warning-1 px-8 border-0">DNU</span>' :
+                    '';
 
                 for (let j = 0; j < selPts[i].properties.equipments.length; j++)
                 {
-                    equip += '<span class="badge hp-text-color-black-100 hp-bg-info-3 px-8 me-4 border-0">'+ selPts[i].properties.equipments[j] +'</span>';
+                    equip += '<span class="badge hp-text-color-black-100 hp-bg-info-3 px-8 me-4 mb-4 border-0">'+ selPts[i].properties.equipments[j] +'</span>';
                 }
 
                 driverList.innerHTML += '<div class="card hp-contact-card mb-16 p-16 rounded border border-black-40 hp-border-color-dark-80 bg-black-0 hp-bg-color-dark-100">\n' +
-                    '<div class="c">\n' +
                     '<div class="row">\n' +
-                    '<div class="col-12">\n' +
-                    '<div class="row align-items-start justify-content-between">\n' +
-                    '<div class="driver_card" data-id="' + selPts[i].properties.id + '" data-name="' + selPts[i].properties.fullname + '"><h5 class=" hp-cursor-pointer mb-8">'+selPts[i].properties.id + ' ' + selPts[i].properties.fullname +'</h5></div>\n' +
-                    '</div>\n' +
-                    '</div>\n' +
+                    '    <div class="col-12">\n' +
+                    '        <div class="row align-items-start justify-content-between">\n' +
+                    '            <div class="driver_card" data-id="' + selPts[i].properties.id + '" data-name="' + selPts[i].properties.fullname + '"><h5 class=" hp-cursor-pointer mb-8">' + selPts[i].properties.id + ' ' + selPts[i].properties.fullname + ' ' + dnu +'</h5></div>\n' +
+                    '        </div>\n' +
+                    '    </div>\n' +
+                    '    <div class="col-12">\n' +
+                    '        <div class="row g-16 justify-content-between">\n' +
+                    '            <div class="col-12">\n' +
+                    '                <div class="row justify-content-between">\n' +
+                    '                    <div class="col-lg-9">\n' +
+                    '                        <div class="row">\n' +
+                    '                            <div class="col-4">\n' +
+                    '                                <p class="driver_card__title">Location:</p>\n' +
+                    '                            </div>\n' +
+                    '                            <div class="col-8">\n' +
+                    '                                <span class="driver_card__text">' + selPts[i].properties.location + ' , ' + selPts[i].properties.zipcode + '</span>\n' +
+                    '                            </div>\n' +
+                    '                        </div>\n' +
+                    '                        <div class="row">\n' +
+                    '                            <div class="col-4">\n' +
+                    '                                <p class="driver_card__title">Dimensions:</p>\n' +
+                    '                            </div>\n' +
+                    '                            <div class="col-8">\n' +
+                    '                                <span class="driver_card__text">' + selPts[i].properties.dimension + '</span>\n' +
+                    '                            </div>\n' +
+                    '                        </div>\n' +
                     '\n' +
-                    '<div class="col-12">\n' +
-                    '<div class="row g-16 justify-content-between">\n' +
-                    '<div class="col-12">\n' +
-                    '<div class="row justify-content-between">\n' +
-                    '<div class="col hp-flex-none w-auto">\n' +
-                    '<div class="row g-8 ">\n' +
-                    '<div class="col hp-flex-none w-auto">\n' +
-                    '<p class="driver_card__title">Location:</p>\n' +
-                    '<p class="driver_card__title">Dimensions:</p>\n' +
-                    '<p class="driver_card__title">Capacity:</p>\n' +
-                    '<p class="driver_card__title">Status:</p>\n' +
-                    '<p class="driver_card__title">Equipment:</p>\n' +
-                    '<p class="driver_card__title">Note:</p>\n' +
-                    '</div>\n' +
+                    '                        <div class="row">\n' +
+                    '                            <div class="col-4">\n' +
+                    '                                <p class="driver_card__title">Capacity:</p>\n' +
+                    '                            </div>\n' +
+                    '                            <div class="col-8">\n' +
+                    '                                <span class="driver_card__text">' + selPts[i].properties.capacity + '</span>\n' +
+                    '                            </div>\n' +
+                    '                        </div>\n' +
                     '\n' +
-                    '<div class="col hp-flex-none w-auto px-0">\n' +
-                    '<p class="driver_card__text">'+ selPts[i].properties.location +'</p>\n' +
-                    '<p class="driver_card__text">'+ selPts[i].properties.dimension +'</p>\n' +
-                    '<p class="driver_card__text">'+ selPts[i].properties.capacity +'</p>\n' +
-                    '<p class="driver_card__text">Resident</p>\n' +
-                    '<p class="driver_card__text"><span class="text-primary">'+ equip +'</span></p>\n' +
-                    '<p class="driver_card__text">'+ selPts[i].properties.note +'</p>\n' +
-                    '</div>\n' +
-                    '</div>\n' +
-                    '</div>\n' +
+                    '                        <div class="row">\n' +
+                    '                            <div class="col-4">\n' +
+                    '                                <p class="driver_card__title">Status:</p>\n' +
+                    '                            </div>\n' +
+                    '                            <div class="col-8">\n' +
+                    '                                <span class="driver_card__text">' + selPts[i].properties.citizenship + '</span>\n' +
+                    '                            </div>\n' +
+                    '                        </div>\n' +
                     '\n' +
-                    '<div class="col hp-flex-none w-auto text-center">\n' +
-                    '<h5>'+ miles_to_driver + ' mi' +'</h5>\n' +
-                    '<p class="hp-p1-body"><span class="badge hp-text-color-black-100 hp-bg-success-3 px-8 border-0">'+ selPts[i].properties.vehicle_type +'</span></p>\n' +
-                    '<a href="#" class="photo-icon" data-id="' + selPts[i].properties.id + '" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">\n' +
-                    '<i class="hp-text-color-dark-0 iconly-Light-Camera"></i>\n' +
-                    '</a>\n' +
-                    '</div>\n' +
-                    '</div>\n' +
-                    '</div>\n' +
+                    '                        <div class="row">\n' +
+                    '                            <div class="col-4">\n' +
+                    '                                <p class="driver_card__title">Equipment:</p>\n' +
+                    '                            </div>\n' +
+                    '                            <div class="col-8">\n' +
+                    '                                ' + equip + ' \n' +
+                    '                            </div>\n' +
+                    '                        </div>\n' +
                     '\n' +
-                    '</div>\n' +
-                    '</div>\n' +
-                    '</div>\n' +
-                    '</div>\n' +
+                    '                        <div class="row">\n' +
+                    '                            <div class="col-4">\n' +
+                    '                                <p class="driver_card__title">Note:</p>\n' +
+                    '                            </div>\n' +
+                    '                            <div class="col-8">\n' +
+                    '                                <span class="driver_card__text">' + selPts[i].properties.note + '</span>\n' +
+                    '                            </div>\n' +
+                    '                        </div>\n' +
+                    '                    </div>\n' +
                     '\n' +
-                    '</div>\n';
+                    '                    <div class="col-lg-3 text-center">\n' +
+                    '                        <h5>' + miles_to_driver + ' mi</h5>\n' +
+                    '                        <div class="badge hp-text-color-black-100 hp-bg-dark-100 px-8 mb-12 border-0" style="display: block;white-space: normal">' + selPts[i].properties.vehicle_type + '</div>\n' +
+                    '                        <div>'+ available +'</div>\n' +
+                    '                        '+ future_datetime +'\n' +
+                    '                        <a href="#" class="photo-icon" data-id="' + selPts[i].properties.id + '" data-bs-toggle="offcanvas" data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">\n' +
+                    '                            <i class="hp-text-color-dark-0 iconly-Light-Camera"></i>\n' +
+                    '                        </a>\n' +
+                    '                    </div>\n' +
+                    '                </div>\n' +
+                    '            </div>\n' +
+                    '\n' +
+                    '        </div>\n' +
+                    '    </div>\n' +
+                    '  </div>\n' +
+                    '</div>';
+
 
                 $('.photo-icon').click(function () {
                     let driver = $(this).data('id');
@@ -414,7 +471,11 @@
                                         '<img class="my-12" src="'+ img +'">\n' +
                                         '</div>';
                                 }
-
+                            }
+                            else {
+                                photosBlock.innerHTML = '<div class="alert alert-danger" role="alert">\n' +
+                                    'Photos not found!\n' +
+                                    '</div>'
                             }
                         },
                         error: function(e) {
@@ -430,7 +491,7 @@
                 let driver = $(this).attr('data-name');
                 map._layers[driver].fire('click');
                 let coords = map._layers[driver]._latlng;
-                map.setView(coords, 4);
+                map.setView(coords, 5);
             });
 
         }	//end of SelectPoints function

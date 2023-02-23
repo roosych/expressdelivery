@@ -32,7 +32,7 @@ return new class extends Migration
                 ->cascadeOnUpdate()
                 ->cascadeOnDelete();
 
-            $table->boolean('service')->default(0);
+            $table->boolean('service')->default(1);
             $table->boolean('status')->default(1);
             $table->boolean('dnu')->default(0);
 
@@ -41,12 +41,12 @@ return new class extends Migration
 
             $table->string('citizenship')->nullable();
 
-            $table->integer('zipcode')->nullable();
+            $table->string('zipcode')->nullable();
             $table->string('location')->nullable();
             $table->string('latitude')->nullable();
             $table->string('longitude')->nullable();
 
-            $table->integer('future_zipcode')->nullable();
+            $table->string('future_zipcode')->nullable();
             $table->string('future_location')->nullable();
             $table->string('future_latitude')->nullable();
             $table->string('future_longitude')->nullable();

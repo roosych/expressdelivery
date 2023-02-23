@@ -9,12 +9,9 @@ use App\Models\Equipment;
 use App\Models\Image;
 use App\Models\Owner;
 use App\Models\VehicleType;
-use http\Env\Response;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
-use function Nette\Utils\isEmpty;
-use function Symfony\Component\String\length;
 
 class DriverController extends Controller
 {
@@ -75,13 +72,39 @@ class DriverController extends Controller
     {
         $data = [
             'service' => $request->service,
+
+            //future data = null when available is on
+            'future_zipcode' => null,
+            'future_location' => null,
+            'future_latitude' => null,
+            'future_longitude' => null,
+            'future_datetime' => null,
         ];
 
         Driver::query()
             ->where('id', $request->id)
             ->update($data);
 
-        return response('success', 200);
+        return response(['msg' => 'success', 'service' => $request->service], 200);
+    }
+
+    public function availability(Request $request, Driver $driver)
+    {
+
+        $data = [
+            'service' => $driver->service = false,
+            'future_zipcode' => $request->future_zipcode,
+            'future_location' => $request->future_location,
+            'future_latitude' => $request->future_latitude,
+            'future_longitude' => $request->future_longitude,
+            'future_datetime' => $request->future_datetime,
+            'note' => $request->note,
+        ];
+
+        $driver->update($data);
+
+        return response(['msg' => 'success', 'data' => $data], 200);
+
     }
 
     public function edit(Driver $driver)
@@ -120,7 +143,7 @@ class DriverController extends Controller
 
     public function getAllDrivers()
     {
-        $data = Driver::with('vehicle_type')
+        $data = Driver::with(['vehicle_type', 'equipment'])
             ->where('status', true)
             ->get()
             ->toArray();
@@ -131,9 +154,16 @@ class DriverController extends Controller
 
         foreach ($data as $item)
         {
-            //dd($item);
+            //dd($item['equipment']);
 
-            $equipments = ['Straps', 'Air ride', 'Ramps'];
+            $equipments = [];
+
+            foreach ($item['equipment'] as $equ)
+            {
+                array_push($equipments, $equ['name']);
+            }
+
+            //dd($equipments);
 
             array_push($res, [
                 "type" => "FeatureCollection",
@@ -144,6 +174,8 @@ class DriverController extends Controller
                             "id" => (int)$item['id'],
                             "fullname" => (string)$item['fullname'],
                             "service" => (boolean)$item['service'],
+                            "citizenship" => (string)$item['citizenship'],
+                            "dnu" => (boolean)$item['dnu'],
                             "latitude" => (string)$item['latitude'],
                             "longitude" => (string)$item['longitude'],
                             "phone" => (string)$item['phone'],
@@ -154,6 +186,12 @@ class DriverController extends Controller
                             "vehicle_type" => (string)$item['vehicle_type']['name'],
                             "note" => (string)$item['note'],
                             "equipments" => (array)$equipments,
+
+                            "future_location" => (string)$item['future_location'],
+                            "future_zipcode" => (string)$item['future_zipcode'],
+                            "future_latitude" => (string)$item['future_latitude'],
+                            "future_longitude" => (string)$item['future_longitude'],
+                            "future_datetime" => (string)$item['future_datetime'],
                         ],
                         "geometry" => [
                             "type" => "Point",

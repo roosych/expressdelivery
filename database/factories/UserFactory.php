@@ -18,13 +18,7 @@ class UserFactory extends Factory
     public function definition()
     {
         return [
-            'name' => 'Global Admin',
-            'email' => 'global@global.com',
-            'email_verified_at' => now(),
-            'password' => bcrypt('global@global.com'),
-            'remember_token' => Str::random(10),
-            'role' => 10,
-            'status' => true,
+            //
         ];
     }
 

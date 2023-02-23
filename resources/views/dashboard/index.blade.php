@@ -40,13 +40,13 @@
                         <div class="row g-16">
                             <div class="col-6 hp-flex-none w-auto">
                                 <div class="avatar-item d-flex align-items-center justify-content-center avatar-lg hp-bg-dark-80 rounded-3">
-                                    <i class="hp-text-color-dark-0 ri-2x ri-tools-line" style="font-size: 24px;"></i>
+                                    <i class="hp-text-color-dark-0 ri-2x ri-emotion-line" style="font-size: 24px;"></i>
                                 </div>
                             </div>
 
                             <div class="col">
-                                <h3 class="mb-4 mt-8">{{$on_service}}</h3>
-                                <p class="hp-p1-body mb-0 text-black-80 hp-text-color-dark-30">In service</p>
+                                <h3 class="mb-4 mt-8">{{$available_now}}</h3>
+                                <p class="hp-p1-body mb-0 text-black-80 hp-text-color-dark-30">Available now</p>
                             </div>
                         </div>
                     </div>

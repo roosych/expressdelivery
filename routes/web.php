@@ -26,7 +26,7 @@ Route::middleware(['auth', 'activeuser'])->group(function (){
                 Route::post('add', [UserController::class, 'store'])->name('user.store');
                 Route::post('update/{user}', [UserController::class, 'update'])->name('user.update');
                 Route::post('/', [UserController::class, 'status'])->name('user.status');
-                Route::get('/delete/{id}', [UserController::class, 'delete'])->name('user.delete');
+                Route::get('/delete/{user}', [UserController::class, 'delete'])->name('user.delete');
             });
         });
 
@@ -38,6 +38,7 @@ Route::middleware(['auth', 'activeuser'])->group(function (){
             Route::post('add', [DriverController::class, 'store'])->name('driver.store');
             Route::post('update/{driver}', [DriverController::class, 'update'])->name('driver.update');
             Route::post('/', [DriverController::class, 'status'])->name('driver.status');
+            Route::post('availability/{driver}', [DriverController::class, 'availability'])->name('driver.availability');
 
             Route::get('{driver}/images', [DriverController::class, 'images'])->name('driver.images');
             Route::post('{driver}/images', [ImageController::class, 'store'])->name('image.store');

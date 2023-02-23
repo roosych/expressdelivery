@@ -17,10 +17,10 @@ class IndexController extends Controller
         $vehicle_types = VehicleType::all()->count();
         $drivers = Driver::all();
         //dd($drivers);
-        $on_service = $drivers->where('service', true)->count();
+        $available_now = $drivers->where('service', true)->count();
 
         //return response()->json(['type' => 'FeatureCollection', 'features' => ['properties' => $drivers],]);
 
-        return view('dashboard.index', compact('drivers', 'on_service', 'users', 'vehicle_types'));
+        return view('dashboard.index', compact('drivers', 'available_now', 'users', 'vehicle_types'));
     }
 }

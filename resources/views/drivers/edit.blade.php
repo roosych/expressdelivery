@@ -126,6 +126,11 @@
                                                 <label class="form-check-label" for="service">
                                                     <span class="ms-12">Availability</span>
                                                 </label>
+                                                @if($driver->service == 0 and $driver->future_datetime > now())
+                                                    <span class="badge_22 badge hp-text-color-black-100 hp-bg-danger-3 mt-12 px-8 border-0">
+                                                        {{ \Carbon\Carbon::parse($driver->future_datetime)->format('M d, g:i A')}}, Future location: {{$driver->future_location}}
+                                                    </span>
+                                                @endif
                                             </div>
 
                                             <div class="form-check form-switch p-10">
@@ -187,7 +192,7 @@
                     </div>
                     <div class="col-lg-3 col-12">
                         <div class="p-24 rounded border border-black-40 hp-border-color-dark-80 bg-black-0 hp-bg-color-dark-100">
-                            <h4 class="mb-0">Location</h4>
+                            <h4 class="mb-0">Current Location</h4>
 
                             <div class="row mt-24">
                                 <div class="col-12">
@@ -235,22 +240,6 @@
         </div>
 @endsection
 
-{{--@foreach($equipment as $item)
-
-    <div class="form-check form-check-inline">
-        <input class="form-check-input" type="checkbox" id="equipment_{{$item->id}}" name="equipment[]" value="{{$item->id}}"
-                {{
-                is_array($driver->equipment->pluck('id')->toArray())
-
-                 &&
-
-                 in_array($item->id, $driver->equipment->pluck('id')->toArray())
-
-                  ? 'checked' : ''}}
-        >
-        <label class="form-check-label" for="equipment_{{$item->id}}">{{$item->name}}</label>
-    </div>
-@endforeach--}}
 @push('js')
     <script>
         function checkZip() {
@@ -266,6 +255,7 @@
                 method: "GET",
                 url: "https://www.zipcodeapi.com/rest/"+api_key+"/info.json/"+zip_code+"/degrees",
                 success: (result) => {
+                    $('#errorMsg').attr('hidden', 'hidden');
                     $('#location').val(result['city'] + ', ' + result['state']);
                     $('#longitude').val(result['lng']);
                     $('#latitude').val(result['lat']);
@@ -274,6 +264,9 @@
                         .html('Fill coords');
                 },
                 error: (error) => {
+                    $('#location').val('');
+                    $('#longitude').val('');
+                    $('#latitude').val('');
                     $('#errorMsg')
                         .removeAttr('hidden')
                         .html('Something went wrong...');

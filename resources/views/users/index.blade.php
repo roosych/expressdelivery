@@ -26,7 +26,13 @@
                 <div class="card hp-contact-card mb-32">
                     <div class="card-body px-0">
                         <div class="table-responsive">
-
+                            <div class="px-12">
+                                @if(session()->has('success'))
+                                    <div class="alert alert-success">
+                                        {{ session()->get('success') }}
+                                    </div>
+                                @endif
+                            </div>
                             <table class="table align-middle table-hover table-borderless">
                                 <thead>
                                 <tr>
@@ -62,7 +68,7 @@
                                                     <i class="iconly-Light-EditSquare hp-cursor-pointer hp-transition hp-hover-text-color-warning-1 text-black-80" style="font-size: 24px;margin-right: 10px;"></i>
                                                 </a>
 
-                                                <a href="{{route('user.delete', $user->id)}}">
+                                                <a href="{{route('user.delete', $user->id)}}" onclick="confirm('Are you sure?')">
                                                     <i class="iconly-Light-Delete hp-cursor-pointer hp-transition hp-hover-text-color-danger-1 text-black-80" style="font-size: 24px;"></i>
                                                 </a>
                                             @endif

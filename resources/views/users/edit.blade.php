@@ -1,17 +1,16 @@
-@extends('layouts.app')
+@extends('layouts.app-horizontal')
 
 @section('title', 'Edit User - Express Delivery PRO')
 
 @section('content')
-    <div class="hp-main-layout-content">
-        <div class="row mb-32 gy-32">
+    <div class="row mb-32 gy-32">
             <div class="col-12">
                 <div class="row justify-content-between gy-32">
 
                     <div class="col-12">
                         <div class="row g-16 align-items-center justify-content-start">
                             <div class="col hp-flex-none w-auto">
-                                <a href="{{route('users.index')}}" class="btn btn-primary w-100">
+                                <a href="{{url()->previous()}}" class="btn btn-primary w-100">
                                     <i class="ri-arrow-left-s-line remix-icon"></i>
                                     <span>All users</span>
                                 </a>
@@ -27,6 +26,12 @@
                         <div class="col-12">
                             <div class="p-16 p-sm-24">
                                 <h3 class="mb-24 text-black-80 hp-text-color-dark-0">Edit User</h3>
+
+                                @if(session()->has('success'))
+                                    <div class="alert alert-success">
+                                        {{ session()->get('success') }}
+                                    </div>
+                                @endif
 
                                 @if ($errors->any())
                                     <div class="alert alert-danger">
@@ -87,6 +92,4 @@
                 </div>
             </div>
         </div>
-
-    </div>
 @endsection

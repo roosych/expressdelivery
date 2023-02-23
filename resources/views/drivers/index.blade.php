@@ -83,16 +83,17 @@
                                                 <input class="form-check-input" name="service" type="checkbox"  data-id="{{$driver->id}}" id="{{$driver->id}}" {{$driver->service ? 'checked' : ''}}>
                                                 <label class="form-check-label" for="{{$driver->id}}"></label>
                                             </div>
-                                            @if($driver->future_datetime > now())
-                                                <span class="badge hp-text-color-black-100 hp-bg-danger-3 mt-4 px-8 border-0">
-                                                    {{ \Carbon\Carbon::parse($driver->future_datetime)->format('M d')}}<br>
-                                                    {{ \Carbon\Carbon::parse($driver->future_datetime)->format('H:m')}}
+                                            @if($driver->service == 0 and $driver->future_datetime > now())
+                                                <span class="badge_{{$driver->id}} badge hp-text-color-black-100 hp-bg-danger-3 mt-4 px-8 border-0">
+                                                    {{ \Carbon\Carbon::parse($driver->future_datetime)->format('M d,')}}<br>
+                                                    {{ \Carbon\Carbon::parse($driver->future_datetime)->format('g:i A')}}
                                                 </span>
 
                                             @endif
                                         </td>
                                         <td>
                                             {{$driver->fullname}}
+                                            {{\Carbon\Carbon::now()}}
                                             @if($driver->owner)
                                             <br><b>Owner:</b> {{$driver->owner->id}} - {{$driver->owner->name}}
                                             @endif
@@ -108,18 +109,6 @@
                                             {{$driver->note}}
                                         </td>
                                         <td class="text-end">
-{{--                                            @if(!is_null($driver->note))
-                                                <div class="btn-group">
-                                                    <a  tabindex="0"
-                                                        data-container="body"
-                                                        data-toggle="popover"
-                                                        data-placement="top"
-                                                        data-trigger="focus"
-                                                        title="{{$driver->note}}"
-                                                    >
-                                                        <i class="iconly-Bold-Paper hp-cursor-pointer hp-transition hp-hover-text-color-warning-1 text-warning" style="font-size: 24px;margin-right: 10px;"></i>
-                                                    </a>
-                                            @endif--}}
                                                 <div class="btn-group">
                                                     <a href="{{route('driver.images', $driver)}}">
                                                         <i class="iconly-Light-Camera hp-cursor-pointer hp-transition hp-hover-text-color-primary-1 text-black-80" style="font-size: 24px;margin-right: 10px;"></i>
@@ -148,38 +137,28 @@
 @include('parts.future_available_modal')
 
 @push('css')
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.1/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="{{asset('assets/css/dataTables.bootstrap5.min.css')}}">
+    <link rel="stylesheet" href="{{asset('assets/css/jquery.datetimepicker.css')}}">
     <style>
         .dataTables_filter, .dataTables_length {
             display: none;
         }
     </style>
+
 @endpush
 
 @push('js')
-    <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
-    <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.13.1/js/dataTables.bootstrap5.min.js"></script>
-
-    <script>
-        // $(document).ready(function () {
-        //     $('#example').DataTable({
-        //         "iDisplayLength": 25,
-        //         "columnDefs": [
-        //             { "orderable": false, "targets": [1, 3, 4, 6, 7] }
-        //         ]
-        //     });
-        // });
-    </script>
+    <script type="text/javascript" src="{{asset('assets/js/jquery.dataTables.min.js')}}"></script>
+    <script type="text/javascript" src="{{asset('assets/js/dataTables.bootstrap5.min.js')}}"></script>
+    <script type="text/javascript" src="{{asset('assets/js/jquery.datetimepicker.js')}}"></script>
 
     <script>
         $(document).ready(function() {
-            // Setup - add a text input to each footer cell
             $('#example thead th.input').each( function () {
                 let title = $('#example thead th.input').eq( $(this).index() ).text();
                 $(this).html( '<input type="text" class="form-control" placeholder=" '+title+'" />' );
             } );
 
-            // DataTable
             let table = $('#example').DataTable({
                         "iDisplayLength": 100,
                         "ordering": false,
@@ -199,19 +178,127 @@
     </script>
 
     <script>
-        $(function() {
-            $('[data-toggle="popover"]').popover()
+        $("#future_date").datetimepicker({
+            minDate: 0,
+            inline: true,
+            format: 'Y-m-d H:i:s',
+            defaultDate: new Date(),
         });
+    </script>
+    <script>
+        function checkZip() {
 
+            const api_key = '{{config('app.zipcode_key')}}';
+            const zip_code = $('#zipcode').val();
+
+            $('#checkBtn')
+                .attr('disabled', true)
+                .html('<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>');
+
+            $.ajax({
+                method: "GET",
+                url: "https://www.zipcodeapi.com/rest/"+api_key+"/info.json/"+zip_code+"/degrees",
+                success: (result) => {
+                    $('#location').val(result['city'] + ', ' + result['state']);
+                    $('#longitude').val(result['lng']);
+                    $('#latitude').val(result['lat']);
+                    $('#checkBtn')
+                        .attr('disabled', false)
+                        .html('Fill coords');
+                    $('#errorMsg')
+                        .attr('hidden', 'hidden')
+                    $('#setFutureAvaBtn').removeAttr('hidden',);
+                },
+                error: (error) => {
+                    $('#location').val('');
+                    $('#longitude').val('');
+                    $('#latitude').val('');
+                    $('#setFutureAvaBtn').attr('hidden', 'hidden');
+                    $('#errorMsg')
+                        .removeAttr('hidden')
+                        .html('Something went wrong...');
+                    $('#checkBtn')
+                        .attr('disabled', false)
+                        .html('Fill coords');
+                }
+            });
+        }
+    </script>
+    <script>
         $(".form-check-input").change(function() {
 
-            $('#future_ava_modal').modal('show');
-
             let token = $('meta[name="csrf-token"]').attr('content');
-            let service;
-            this.checked ? service = 1 : service = 0;
+            let id = this.id;
+            let url = "{{route('driver.status')}}";
 
-            $.post('{{route('driver.status')}}', {id: this.id, service: service, _token: token});
+            if (this.checked) {
+                //set status true if switch on
+                $.ajax({
+                    method: 'POST',
+                    url: url,
+                    data: {_token: token, id: id, service: 1,},
+                    success: (response) => {
+                        if (response.msg === 'success'){
+                            $('.badge_' + id).html('');
+                        }
+                    }
+                });
+            } else {
+                let modal = $('#future_ava_modal');
+                modal.modal('show');
+
+                // let data = new FormData();
+                // console.log(data);
+
+                $('#setFutureAvaBtn').click(function () {
+                    let form = $('#futureAvaForm');
+                    $(this)
+                        .attr('disabled', true)
+                        .html('<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>');
+
+                    // convert serializeArray to object
+                    let data = {'_token': token};
+                    form.serializeArray().map(function(x){data[x.name] = x.value;});
+
+                    //console.log(data);
+
+                    $.ajax({
+                        method: 'POST',
+                        url: '{{route('driver.availability', '')}}' + "/" + id,
+                        data: data,
+                        success: (response) => {
+                            console.log(response);
+                            modal.modal('hide');
+                            location.reload();
+
+                            $(this)
+                                .attr('disabled', false)
+                                .html('Save future availability data');
+                        },
+                        error: (error) => {
+
+                            $('#avaFormError').removeAttr('hidden');
+                        }
+                    });
+                });
+
+                // set status false when modal closed
+                modal.on('hidden.bs.modal', function () {
+                    $.ajax({
+                        method: 'POST',
+                        url: url,
+                        data: {_token: token, id: id, service: 0,},
+                        success: (response) => {
+                            //console.log(response);
+                            if (response.msg === 'success'){
+                                console.log('modal close and status = 0')
+                            }
+                        }
+                    });
+                })
+            }
+
+
         });
     </script>
 @endpush
