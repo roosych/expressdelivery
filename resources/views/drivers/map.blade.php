@@ -339,7 +339,7 @@
 
                 let future_format = moment(future_timestamp).format('MMM, DD h:hh A');
 
-                console.log(future_format);
+                //console.log(future_format);
 
 
 
@@ -465,7 +465,8 @@
                             if(response.data.length > 0) {
                                 for (i = 0; i < response.data.length; i++) {
                                     let filename = response.data[i]['filename'];
-                                    let img = '/storage/images/drivers/' + driver + '/' + filename + '';
+                                    console.log(filename);
+                                    let img = '/storage/' + filename;
                                     photosBlock.innerHTML +=
                                         '<div class="col-lg-4 col-12">\n' +
                                         '<img class="my-12" src="'+ img +'">\n' +

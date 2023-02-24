@@ -24,7 +24,7 @@ class DriverController extends Controller
 
         foreach ($drivers as $driver)
         {
-            echo $driver->future_datetime;
+            //echo $driver->future_datetime;
             if ($driver->service == false && $driver->future_datetime != null && $driver->future_datetime < now()) {
 
                 $driver->update([

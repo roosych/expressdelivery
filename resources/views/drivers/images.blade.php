@@ -62,11 +62,7 @@
                                             @foreach($driver->images as $image)
                                                 <div class="col-lg-2">
                                                     <div class="card rounded-1">
-{{--
-                                                        <img src="/storage/images/drivers/{{$driver->id}}/{{$image->filename}}" alt="" class="img-fluid">
---}}
                                                         <img src="/storage/{{$image->filename}}" alt="" class="img-fluid">
-
                                                         <div class="text-center mb-8 mt-8">
                                                             <a href="{{route('image.delete', [$driver, $image])}}" onclick="confirm('Are you sure?')" class="btn btn-sm btn-danger delete_image" data-id="{{$image->id}}">Delete</a>
                                                         </div>
