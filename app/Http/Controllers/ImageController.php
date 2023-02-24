@@ -24,20 +24,22 @@ class ImageController extends Controller
         {
             foreach ($files as $key => $file) {
 
-                $extension = $file->getClientOriginalExtension();
-
-                $fileName = time() .'-'. $key .'.'. $extension;
-
-                $filePath = 'images/drivers/' .$driver->id . '/' . $fileName;
-
-                Storage::disk('public')->put($filePath, file_get_contents($file));
+//                $extension = $file->getClientOriginalExtension();
+//
+//                $fileName = time() .'-'. $key .'.'. $extension;
+//
+//                $filePath = 'images/drivers/' .$driver->id . '/' . $fileName;
+//
+//                Storage::disk('public')->put($filePath, file_get_contents($file));
 
                 //полный путь
                 //$path = Storage::disk('public')->url($path);
+                $file = Storage::disk('public')->put('images/drivers/' .$driver->id, $file);
 
                 $data = [
                     'driver_id' => $driver->id,
-                    'filename' => $fileName
+                    //'filename' => $fileName
+                    'filename' => $file
                 ];
 
                 Image::query()->create($data);

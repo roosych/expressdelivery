@@ -53,7 +53,7 @@
                 </div>
 
                 </form>
-                <div id="avaFormError" class="alert alert-danger mt-16 p-8" hidden="hidden">Something went wrong! Try again</div>
+                <div id="avaFormError" class="alert alert-danger mt-16 p-8" hidden="hidden">Check if the date is correct?</div>
 
             </div>
 

@@ -21,6 +21,33 @@ class DriverController extends Controller
             ->with(['vehicle_type', 'owner'])
             ->orderBy('created_at', 'desc')
             ->get();
+
+        foreach ($drivers as $driver)
+        {
+            echo $driver->future_datetime;
+            if ($driver->service == false && $driver->future_datetime != null && $driver->future_datetime < now()) {
+
+                $driver->update([
+                    'service' => true,
+
+                    //перегоняем фьючеры в карренты
+                    'zipcode' => $driver->future_zipcode,
+                    'location' => $driver->future_location,
+                    'latitude' => $driver->future_latitude,
+                    'longitude' => $driver->future_longitude,
+
+                    //очищаем фьючеры
+                    'future_zipcode' => null,
+                    'future_location' => null,
+                    'future_latitude' => null,
+                    'future_longitude' => null,
+                    'future_datetime' => null,
+                ]);
+
+            }
+        }
+
+
         return view('drivers.index', compact('drivers'));
     }
 
@@ -70,22 +97,30 @@ class DriverController extends Controller
 
     public function status(Request $request)
     {
-        $data = [
-            'service' => $request->service,
+        if($request->service == 1) {
+            $data = [
+                'service' => $request->service,
 
-            //future data = null when available is on
-            'future_zipcode' => null,
-            'future_location' => null,
-            'future_latitude' => null,
-            'future_longitude' => null,
-            'future_datetime' => null,
-        ];
+                //future data = null when available is on
+                'future_zipcode' => null,
+                'future_location' => null,
+                'future_latitude' => null,
+                'future_longitude' => null,
+                'future_datetime' => null,
+            ];
+        } else {
+            $data = [
+                'service' => $request->service,
+            ];
+        }
+
 
         Driver::query()
             ->where('id', $request->id)
             ->update($data);
 
         return response(['msg' => 'success', 'service' => $request->service], 200);
+
     }
 
     public function availability(Request $request, Driver $driver)
@@ -93,17 +128,23 @@ class DriverController extends Controller
 
         $data = [
             'service' => $driver->service = false,
-            'future_zipcode' => $request->future_zipcode,
-            'future_location' => $request->future_location,
-            'future_latitude' => $request->future_latitude,
-            'future_longitude' => $request->future_longitude,
-            'future_datetime' => $request->future_datetime,
-            'note' => $request->note,
+            'future_zipcode' => (int)$request->future_zipcode,
+            'future_location' => (string)$request->future_location,
+            'future_latitude' => (string)$request->future_latitude,
+            'future_longitude' => (string)$request->future_longitude,
+            'future_datetime' => (string)$request->future_datetime,
+            'note' => (string)$request->note,
         ];
 
-        $driver->update($data);
+        try {
+            $driver->update($data);
 
-        return response(['msg' => 'success', 'data' => $data], 200);
+            return response(['msg' => 'success', 'data' => $data], 200);
+        } catch (\Exception $e)
+        {
+            return response(['msg' => $e], 400);
+        }
+
 
     }
 

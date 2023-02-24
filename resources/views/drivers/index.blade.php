@@ -93,7 +93,6 @@
                                         </td>
                                         <td>
                                             {{$driver->fullname}}
-                                            {{\Carbon\Carbon::now()}}
                                             @if($driver->owner)
                                             <br><b>Owner:</b> {{$driver->owner->id}} - {{$driver->owner->name}}
                                             @endif
@@ -275,8 +274,11 @@
                                 .attr('disabled', false)
                                 .html('Save future availability data');
                         },
-                        error: (error) => {
-
+                        error: (response) => {
+                            console.log(response);
+                            $('#setFutureAvaBtn')
+                                .attr('disabled', false)
+                                .html('Save future availability data');
                             $('#avaFormError').removeAttr('hidden');
                         }
                     });
